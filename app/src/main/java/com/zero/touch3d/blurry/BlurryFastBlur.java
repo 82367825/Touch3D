@@ -2,16 +2,19 @@ package com.zero.touch3d.blurry;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
+
 
 /**
  * FastBlur算法实现图片模糊
+ * 没有版本兼容问题，但是需要先缩小图片，以便提高速度
  * @author linzewu
  * @date 16-10-13
  */
 public class BlurryFastBlur implements IBlurry {
 
     private static final int DEFAULT_RADIUS = 20;
-    private int mRadius;
+    private int mRadius = 20;
     
     public BlurryFastBlur() {
         mRadius = DEFAULT_RADIUS;
@@ -19,20 +22,23 @@ public class BlurryFastBlur implements IBlurry {
     
     @Override
     public Bitmap getBlurryBitmap(Context context, Bitmap bitmap) {
-        Bitmap result = 
-        return doBlur(bitmap, mRadius, true);
+        Bitmap result = scaleBitmap(bitmap);
+        return restoreBitmap(doBlur(result, mRadius, true));
     }
-
-    private int mScale = 8;
+    
     
     private Bitmap scaleBitmap(Bitmap bitmap) {
+        Matrix matrix = new Matrix();
+        matrix.postScale(0.1f, 0.1f);
         return Bitmap.createBitmap(bitmap, 0, 0, 
-                bitmap.getWidth() / mScale, bitmap.getHeight() / mScale);
+                bitmap.getWidth() , bitmap.getHeight(), matrix, true);
     }
     
     private Bitmap restoreBitmap(Bitmap bitmap) {
+        Matrix matrix = new Matrix();
+        matrix.postScale(10f, 10f);
         return Bitmap.createBitmap(bitmap, 0, 0,
-                bitmap.getWidth() * mScale, bitmap.getHeight() * mScale);
+                bitmap.getWidth(), bitmap.getHeight(), matrix, true);
     }
     
     /**

@@ -7,10 +7,12 @@ package com.zero.touch3d.blurry;
  */
 public class BlurryFactory {
     
-    public static IBlurry createBlurry() {
-        return null;
+    public static IBlurry createRenderScript() {
+        return new BlurryRenderScript();
     }
     
-    
+    public static IBlurry createFastBlur() {
+        return new BlurryFastBlur();
+    }
     
 }
