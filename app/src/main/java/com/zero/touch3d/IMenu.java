@@ -5,9 +5,6 @@ package com.zero.touch3d;
  * @date 16/10/16
  */
 public interface IMenu {
-    
-//    void onAnimShow();
-
     /**
      * 手指在菜单上移动
      * @param x 横坐标

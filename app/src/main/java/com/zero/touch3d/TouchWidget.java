@@ -130,9 +130,11 @@ public class TouchWidget extends FrameLayout {
                 break;
             case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP:
-                if (isInMenuWidget(event.getX(), event.getY())) {
-                    mMenuWidget.onTouchUp(event.getX() - mMenuWidget.getX(), 
-                            event.getY() - mMenuWidget.getY());
+                if (isInMenuWidget(event.getX(), event.getY()) && mTouchListener != null) {
+                    mTouchListener.onSelect(
+                        mMenuWidget.onTouchUp(event.getX() - mMenuWidget.getX(), 
+                            event.getY() - mMenuWidget.getY())
+                    );
                 }
                 break;
         }
@@ -140,7 +142,7 @@ public class TouchWidget extends FrameLayout {
     }
 
     public interface TouchListener {
-        void onSelect(int command);
+        void onSelect(String command);
     }
     
     private TouchListener mTouchListener;

@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
+
 import com.zero.touch3d.R;
 import com.zero.touch3d.Touch3DUtils;
 import com.zero.touch3d.TouchWidget;
@@ -58,6 +60,12 @@ public class MainActivity extends Activity {
                 touchWidget.setBackgroundView(bitmap);
                 touchWidget.setIconView(mButton);
                 touchWidget.show(MainActivity.this);
+                touchWidget.setTouchListener(new TouchWidget.TouchListener() {
+                    @Override
+                    public void onSelect(String command) {
+                        Toast.makeText(MainActivity.this, command, Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
     }
