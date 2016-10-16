@@ -1,4 +1,4 @@
-package com.zero.touch3d;
+package com.zero.touch3d.demo;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
@@ -6,8 +6,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
-import android.widget.FrameLayout;
-
+import com.zero.touch3d.R;
+import com.zero.touch3d.Touch3DUtils;
+import com.zero.touch3d.TouchWidget;
 import com.zero.touch3d.blurry.BlurryController;
 
 /**
@@ -16,6 +17,7 @@ import com.zero.touch3d.blurry.BlurryController;
  */
 public class MainActivity extends Activity {
 
+    private Button mButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,8 +25,8 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
 
-        Button button = (Button) findViewById(R.id.blurry);
-        button.setOnClickListener(new View.OnClickListener() {
+        mButton = (Button) findViewById(R.id.blurry);
+        mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 loadBlurry();
@@ -53,12 +55,9 @@ public class MainActivity extends Activity {
             @Override
             public void run() {
                 TouchWidget touchWidget = new TouchWidget(MainActivity.this);
-                touchWidget.setBackgroundBitmap(bitmap);
-                FrameLayout decor = (FrameLayout)MainActivity.this.getWindow().getDecorView();
-                FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
-                        FrameLayout.LayoutParams.MATCH_PARENT,
-                        FrameLayout.LayoutParams.MATCH_PARENT);
-                decor.addView(touchWidget, lp);
+                touchWidget.setBackgroundView(bitmap);
+                touchWidget.setIconView(mButton);
+                touchWidget.show(MainActivity.this);
             }
         });
     }

@@ -15,12 +15,12 @@ public class BlurryController {
     
     public BlurryController(Context context) {
         mContext = context;
-//        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-//            mIBlurry = BlurryFactory.createRenderScript();
-//        } else {
-//            mIBlurry = BlurryFactory.createFastBlur();
-//        }
-        mIBlurry = BlurryFactory.createFastBlur();
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            mIBlurry = BlurryFactory.createRenderScript();
+        } else {
+            mIBlurry = BlurryFactory.createFastBlur();
+        }
+//        mIBlurry = BlurryFactory.createFastBlur();
     }
     
     public void startBlurry(Bitmap bitmap) {
