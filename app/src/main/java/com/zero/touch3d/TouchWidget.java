@@ -1,18 +1,20 @@
 package com.zero.touch3d;
 
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
+import android.os.Build;
 import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.LinearInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.PopupWindow;
 
 /**
  * 仿3DTouch效果
@@ -21,9 +23,7 @@ import android.widget.PopupWindow;
  */
 public class TouchWidget extends FrameLayout {
     
-    private static final int STATUS_FINGER_NOT_LEAVE = 0x01;
-    private static final int STATUS_FINGER_LEAVE = 0x02;
-    private int mStatusFinger = STATUS_FINGER_NOT_LEAVE;
+    private boolean mIsShowing = false;
     
     private ImageView mBackgroundView;
     private LayoutParams mBackgroundParams;
@@ -67,7 +67,7 @@ public class TouchWidget extends FrameLayout {
                 .LayoutParams.WRAP_CONTENT);
         mContentLayout.addView(mMenuWidget, mMenuParams);
     }
-
+    
     /**
      * 公开方法: 设置图标
      * @param iconView
@@ -78,9 +78,14 @@ public class TouchWidget extends FrameLayout {
         }
         mIconView.setImageBitmap(Touch3DUtils.takeViewShot(iconView));
         mIconView.setX(iconView.getX());
-        mIconView.setY(iconView.getY());
-        mMenuWidget.setX(iconView.getMeasuredWidth());
-        mMenuWidget.setY(iconView.getMeasuredHeight());
+        mIconView.setY(iconView.getY() + Touch3DUtils.getStatusHeight());
+        if (iconView.getX() > Touch3DUtils.getScreenHeight() / 2) {
+            mMenuWidget.setX(iconView.getMeasuredWidth() - 50);
+            mMenuWidget.setY(iconView.getMeasuredHeight());
+        } else if (iconView.getX() < Touch3DUtils.getScreenHeight() / 2) {
+            mMenuWidget.setX(iconView.getMeasuredWidth() - 50);
+            mMenuWidget.setY(iconView.getMeasuredHeight());
+        }
     }
 
     /**
@@ -101,15 +106,67 @@ public class TouchWidget extends FrameLayout {
     public void show(Activity activity) {
         attachActivity(activity);
         transferTouchEvent(activity);
-    }
-    
-    public void hide() {
-        
+        animMenu();
+        animIcon();
+        mIsShowing = true;
     }
 
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
+    /**
+     * 公开方法：隐藏
+     */
+    public void hide(Activity activity) {
+        disAttachActivity(activity);
+    }
+
+    /**
+     * 公开方法：是否仍在展示
+     */
+    public boolean isShowing() {
+        return mIsShowing;
+    }
+    
+    private static final long DURATION_MENU_ANIM = 400;
+    private static final long DURATION_ICON_ANIM = 300;
+
+    private void animMenu() {
+        if (mMenuWidget == null) {
+            return ;
+        }
+        mMenuWidget.setPivotX(0f);
+        mMenuWidget.setPivotY(0f);
+        mMenuWidget.setScaleX(0f);
+        mMenuWidget.setScaleY(0f);
+        ValueAnimator valueAnimator = ValueAnimator.ofFloat(0, 1.2f, 1f);
+        valueAnimator.setDuration(DURATION_MENU_ANIM);
+        valueAnimator.setInterpolator(new LinearInterpolator());
+        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                float value = (float) animation.getAnimatedValue();
+                mMenuWidget.setScaleX(value);
+                mMenuWidget.setScaleY(value);
+            }
+        });
+        valueAnimator.setStartDelay(200);
+        valueAnimator.start();
+    }
+    
+    private void animIcon() {
+        if (mIconView == null) {
+            return ;
+        }
+        ValueAnimator valueAnimator = ValueAnimator.ofFloat(1f, 1.2f);
+        valueAnimator.setDuration(DURATION_ICON_ANIM);
+        valueAnimator.setInterpolator(new DecelerateInterpolator());
+        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                float value = (float) animation.getAnimatedValue();
+                mIconView.setScaleX(value);
+                mIconView.setScaleY(value);
+            }
+        });
+        valueAnimator.start();
     }
 
     @Override
@@ -123,14 +180,15 @@ public class TouchWidget extends FrameLayout {
             case MotionEvent.ACTION_DOWN:
                 break;
             case MotionEvent.ACTION_MOVE:
-                if (isInMenuWidget(event.getX(), event.getY())) {
+                if (Touch3DUtils.isInView(mMenuWidget, event.getX(), event.getY())) {
                     mMenuWidget.onTouchMove(event.getX() - mMenuWidget.getX(),
                             event.getY() - mMenuWidget.getY());
                 }
                 break;
             case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP:
-                if (isInMenuWidget(event.getX(), event.getY()) && mTouchListener != null) {
+                if (Touch3DUtils.isInView(mMenuWidget, event.getX(), event.getY()) && 
+                        mTouchListener != null) {
                     mTouchListener.onSelect(
                         mMenuWidget.onTouchUp(event.getX() - mMenuWidget.getX(), 
                             event.getY() - mMenuWidget.getY())
@@ -149,17 +207,6 @@ public class TouchWidget extends FrameLayout {
     public void setTouchListener(TouchListener touchListener) {
         this.mTouchListener = touchListener;
     }
-
-    /**
-     * 触摸点是否在菜单视图内
-     * @param x
-     * @param y
-     * @return
-     */
-    private boolean isInMenuWidget(float x, float y) {
-        return x > mMenuWidget.getX() && x < mMenuWidget.getX() + mMenuWidget.getWidth() 
-                && y > mMenuWidget.getY() && y < mMenuWidget.getY() + mMenuWidget.getHeight();
-    }
     
     /**
      * 挂载到某个Activity的最顶层 
@@ -176,7 +223,24 @@ public class TouchWidget extends FrameLayout {
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT);
         decor.addView(this, lp);
-        transferTouchEvent(activity);
+    }
+
+    /**
+     * 从某个Activity移除
+     * @param activity
+     */
+    private void disAttachActivity(Activity activity) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            if (!isAttachedToWindow()) {
+                return ;
+            }
+        }
+        try {
+            FrameLayout decor = (FrameLayout) activity.getWindow().getDecorView();
+            decor.removeView(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**

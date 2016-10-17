@@ -25,16 +25,16 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
+        
         mButton = (Button) findViewById(R.id.blurry);
-        mButton.setOnClickListener(new View.OnClickListener() {
+        mButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onLongClick(View v) {
+                Touch3DUtils.initTouch3D(MainActivity.this);
                 loadBlurry();
+                return false;
             }
         });
-        
     }
     
     private BlurryController mBlurryController;
@@ -69,6 +69,10 @@ public class MainActivity extends Activity {
             }
         });
     }
-    
-    
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        
+    }
 }

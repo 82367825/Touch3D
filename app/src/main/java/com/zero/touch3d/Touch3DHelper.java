@@ -1,9 +1,5 @@
 package com.zero.touch3d;
 
-import android.app.Activity;
-import android.view.View;
-
-import java.util.List;
 
 /**
  * @author linzewu

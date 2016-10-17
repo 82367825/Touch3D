@@ -20,7 +20,6 @@ public class BlurryController {
         } else {
             mIBlurry = BlurryFactory.createFastBlur();
         }
-//        mIBlurry = BlurryFactory.createFastBlur();
     }
     
     public void startBlurry(Bitmap bitmap) {

@@ -42,6 +42,7 @@ public class MenuWidget extends LinearLayout implements IMenu {
                 .LayoutParams.WRAP_CONTENT);
         addView(mLinearLayout, mLayoutParams);
         mLinearLayout.setOrientation(VERTICAL);
+        mLinearLayout.setBackgroundColor(0xFFFFFFFF);
     }
 
     private void initMenu() {
