@@ -7,7 +7,7 @@ package com.zero.touch3d;
 public class MenuCommand {
     
     public static final String[] MENU_COMMAND = {
-       "COMMAND_DELETE", "COMMAND_CREATE_SHORTCUT"      
+       "COMMAND_A", "COMMAND_B"      
     };
     
     public static int getResCommand(String command) {

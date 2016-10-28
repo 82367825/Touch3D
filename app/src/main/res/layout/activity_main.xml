@@ -7,7 +7,11 @@
     
     <Button
         android:id="@+id/blurry"
-        android:text="show blurry"
+        android:text="show"
+        android:background="@color/colorAccent"
+        android:textColor="@android:color/white"
+        android:layout_margin="20dp"
+        android:padding="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
     

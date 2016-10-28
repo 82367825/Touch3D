@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 /**
  * @author linzewu
@@ -48,11 +49,15 @@ public class MenuWidget extends LinearLayout implements IMenu {
     private void initMenu() {
         mMenuCommand = MenuCommand.MENU_COMMAND;
         for (String menuCommand : mMenuCommand) {
-            Button button = new Button(getContext());
-            button.setText(menuCommand);
+            TextView textView = new TextView(getContext());
+            textView.setText(menuCommand);
             LayoutParams layoutParams = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 
                     ViewGroup.LayoutParams.WRAP_CONTENT);
-            mLinearLayout.addView(button, layoutParams);
+            layoutParams.leftMargin = 50;
+            layoutParams.rightMargin = 50;
+            layoutParams.topMargin = 50;
+            layoutParams.bottomMargin = 50;
+            mLinearLayout.addView(textView, layoutParams);
         }
     }
 
@@ -64,8 +69,8 @@ public class MenuWidget extends LinearLayout implements IMenu {
         for (int i = 0; i < mLinearLayout.getChildCount(); i++) {
             View view = mLinearLayout.getChildAt(i);
             if (Touch3DUtils.isInView(view, x, y)
-                    && view instanceof Button) {
-                return (String) ((Button)view).getText();
+                    && view instanceof TextView) {
+                return (String) ((TextView)view).getText();
             }
         }
         return null;
@@ -79,8 +84,8 @@ public class MenuWidget extends LinearLayout implements IMenu {
         for (int i = 0; i < mLinearLayout.getChildCount(); i++) {
             View view = mLinearLayout.getChildAt(i);
             if (Touch3DUtils.isInView(view, x, y)
-                    && view instanceof Button) {
-                return (String) ((Button)view).getText();
+                    && view instanceof TextView) {
+                return (String) ((TextView)view).getText();
             }
         }
         return null;

@@ -11,7 +11,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-import android.view.animation.DecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -27,8 +26,11 @@ public class TouchWidget extends FrameLayout {
     
     private ImageView mBackgroundView;
     private LayoutParams mBackgroundParams;
+    
     private ImageView mIconView;
     private LayoutParams mIconParams;
+    private int[] mIconLocation;
+    
     private MenuWidget mMenuWidget;
     private LayoutParams mMenuParams;
     private FrameLayout mContentLayout;
@@ -74,18 +76,17 @@ public class TouchWidget extends FrameLayout {
      */
     public void setIconView(View iconView) {
         if (mIconView == null) {
-            return ;
+            return;
         }
+        mIconLocation = new int[2];
+        iconView.getLocationOnScreen(mIconLocation);
         mIconView.setImageBitmap(Touch3DUtils.takeViewShot(iconView));
-        mIconView.setX(iconView.getX());
-        mIconView.setY(iconView.getY() + Touch3DUtils.getStatusHeight());
-        if (iconView.getX() > Touch3DUtils.getScreenHeight() / 2) {
-            mMenuWidget.setX(iconView.getMeasuredWidth() - 50);
-            mMenuWidget.setY(iconView.getMeasuredHeight());
-        } else if (iconView.getX() < Touch3DUtils.getScreenHeight() / 2) {
-            mMenuWidget.setX(iconView.getMeasuredWidth() - 50);
-            mMenuWidget.setY(iconView.getMeasuredHeight());
-        }
+        mIconView.setX(mIconLocation[0]);
+        mIconView.setY(mIconLocation[1]);
+        mIconView.measure(0, 0);
+
+        mMenuWidget.setX(mIconView.getX());
+        mMenuWidget.setY(mIconView.getY() + mIconView.getMeasuredHeight() + 20);
     }
 
     /**
@@ -136,7 +137,7 @@ public class TouchWidget extends FrameLayout {
         mMenuWidget.setPivotY(0f);
         mMenuWidget.setScaleX(0f);
         mMenuWidget.setScaleY(0f);
-        ValueAnimator valueAnimator = ValueAnimator.ofFloat(0, 1.2f, 1f);
+        ValueAnimator valueAnimator = ValueAnimator.ofFloat(0, 1f, 1.2f, 1f);
         valueAnimator.setDuration(DURATION_MENU_ANIM);
         valueAnimator.setInterpolator(new LinearInterpolator());
         valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -155,9 +156,9 @@ public class TouchWidget extends FrameLayout {
         if (mIconView == null) {
             return ;
         }
-        ValueAnimator valueAnimator = ValueAnimator.ofFloat(1f, 1.2f);
+        ValueAnimator valueAnimator = ValueAnimator.ofFloat(1f, 1.1f);
         valueAnimator.setDuration(DURATION_ICON_ANIM);
-        valueAnimator.setInterpolator(new DecelerateInterpolator());
+        valueAnimator.setInterpolator(new LinearInterpolator());
         valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
